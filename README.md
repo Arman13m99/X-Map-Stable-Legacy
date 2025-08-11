@@ -73,7 +73,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configure Metabase Connection
-Edit the configuration in `app.py`:
+Edit credentials and question IDs in `config.py`:
 ```python
 METABASE_URL = "https://metabase.ofood.cloud"
 METABASE_USERNAME = "your.email@domain.com"
@@ -105,6 +105,13 @@ python run_production.py
 The production runner automatically detects the operating system and uses:
 - **Windows**: Waitress WSGI server
 - **Linux/Unix**: Gunicorn with optimal worker configuration
+
+### Docker
+A Dockerfile is included for containerized deployments:
+```bash
+docker build -t map-dashboard .
+docker run -p 5001:5001 map-dashboard
+```
 
 ## 🔄 Project Flow
 
@@ -265,16 +272,12 @@ Main endpoint for retrieving filtered map data.
 
 ## ⚙️ Configuration
 
-### Environment Variables
-```bash
-export METABASE_URL="https://your-metabase.com"
-export METABASE_USERNAME="your-username"
-export METABASE_PASSWORD="your-password"
-```
+### Configuration File
+All connection details are stored in `config.py` and can be edited directly.
 
 ### Performance Tuning
 ```python
-# In app.py
+# In config.py
 WORKER_COUNT = 10           # Metabase parallel workers
 PAGE_SIZE = 100000          # Records per page
 CACHE_SIZE = 100           # Coverage cache limit
