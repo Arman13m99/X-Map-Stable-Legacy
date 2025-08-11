@@ -1,8 +1,7 @@
-# TAPSI Food Map Dashboard
+# Map Dashboard
 
 A comprehensive geospatial analytics dashboard for visualizing and analyzing food delivery vendor data, customer orders, and market coverage across multiple Iranian cities. Built with Flask, Leaflet.js, and real-time Metabase integration.
 
-![Dashboard Preview](https://via.placeholder.com/800x400?text=TAPSI+Food+Map+Dashboard)
 
 ## 🌟 Features
 
@@ -368,25 +367,3 @@ app.run(debug=True, port=5001, use_reloader=True)
 - [ ] Docker containerization
 - [ ] CI/CD pipeline
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is proprietary and confidential. Unauthorized copying, modification, or distribution is prohibited.
-
-## 📞 Support
-
-For technical support or questions:
-- **Email**: support@tapsi.ir
-- **Internal**: Business Growth Team
-- **Documentation**: See inline code comments
-
----
-
-**Built with ❤️ by the TAPSI Business Growth Team**
