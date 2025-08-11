@@ -1,3 +1,5 @@
+"""Main Flask application for the Map Dashboard."""
+
 # app.py (Complete updated file with NaN handling fix)
 import os
 from datetime import datetime
@@ -20,17 +22,24 @@ from functools import lru_cache
 from mini import fetch_question_data
 from scipy import stats  # NEW: Added for improved statistical functions
 
+# Configuration settings are centralized in ``config.py`` so that credentials
+# and other tunable constants live in a single location.
+from config import (
+    METABASE_URL,
+    METABASE_USERNAME,
+    METABASE_PASSWORD,
+    ORDER_DATA_QUESTION_ID,
+    VENDOR_DATA_QUESTION_ID,
+    WORKER_COUNT,
+    PAGE_SIZE,
+    CACHE_SIZE,
+    city_boundaries,
+)
+
 # --- Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SRC_DIR = os.path.join(BASE_DIR, 'src')
 PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
-METABASE_URL = "https://metabase.ofood.cloud"       
-METABASE_USERNAME = "a.mehmandoost@OFOOD.CLOUD"  
-METABASE_PASSWORD = "Fff322666@"   
-ORDER_DATA_QUESTION_ID = 5822 
-VENDOR_DATA_QUESTION_ID = 5045 
-WORKER_COUNT = 10    
-PAGE_SIZE = 100000 
 
 # --- Initialize Flask App ---
 app = Flask(__name__, static_folder=PUBLIC_DIR, static_url_path='')
@@ -52,15 +61,11 @@ city_id_map = {1: "mashhad", 2: "tehran", 5: "shiraz"}
 city_name_to_id_map = {v: k for k, v in city_id_map.items()}
 
 # Simple cache for coverage calculations
+# In-memory cache for coverage calculations. The maximum size is configured
+# in ``config.py`` via ``CACHE_SIZE`` to avoid unbounded memory growth.
 coverage_cache = {}
-CACHE_SIZE = 100  # Limit cache size to prevent memory issues
 
-# City boundaries for grid generation (approximate)
-city_boundaries = {
-    "tehran": {"min_lat": 35.5, "max_lat": 35.85, "min_lng": 51.1, "max_lng": 51.7},
-    "mashhad": {"min_lat": 36.15, "max_lat": 36.45, "min_lng": 59.35, "max_lng": 59.8},
-    "shiraz": {"min_lat": 29.5, "max_lat": 29.75, "min_lng": 52.4, "max_lng": 52.7}
-}
+# ``city_boundaries`` used by the coverage grid is imported from ``config``.
 
 # --- Helper Functions ---
 
@@ -671,6 +676,11 @@ def aggregate_user_heatmap_points(df, lat_col, lng_col, user_col, precision=4):
     return aggregated[['lat', 'lng', 'value']]
 
 def load_data():
+    """Load all required datasets from Metabase and local sources.
+
+    This function populates global data frames used by the API layer. It is
+    executed at start-up both in development and production environments.
+    """
     global df_orders, df_vendors, gdf_marketing_areas, gdf_tehran_region, gdf_tehran_main_districts, df_coverage_targets, target_lookup_dict
     print("Loading data...")
     start_time = time.time()

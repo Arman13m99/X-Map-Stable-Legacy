@@ -6,13 +6,17 @@ using a highly optimized parallel pagination method. This version authenticates 
 once to maximize speed.
 """
 
-import os
 import requests
 import pandas as pd
 import logging
 import concurrent.futures
 from typing import Optional
 from dataclasses import dataclass
+
+# Central configuration values are stored in ``config.py`` so that this module
+# can be executed as a standalone script without depending on environment
+# variables.
+from config import METABASE_URL, METABASE_USERNAME, METABASE_PASSWORD
 
 # --- Configuration & Setup ---
 
@@ -270,36 +274,31 @@ def fetch_question_data(
 # --- Example Usage ---
 
 if __name__ == "__main__":
-    METABASE_URL = os.getenv("METABASE_URL", "https://metabase.ofood.cloud")
-    METABASE_USERNAME = os.getenv("METABASE_USERNAME", "a.mehmandoost@OFOOD.CLOUD")
-    METABASE_PASSWORD = os.getenv("METABASE_PASSWORD", "REPLACE_WITH_YOUR_PASSWORD") # <-- REPLACE THIS
+    # Example invocation using credentials from ``config.py``
     METABASE_TEAM = "growth"
     QUESTION_ID_TO_FETCH = 3132
-    
+
     # --- TUNING PARAMETERS ---
     # Adjust these to find the sweet spot for your connection and server capacity
     WORKER_COUNT = 10       # Number of parallel downloads. Start with 8-12.
     PAGE_SIZE = 75000       # Rows per download. Larger can be faster but uses more memory. 50k-100k is a good range.
-    
-    if METABASE_PASSWORD == "REPLACE_WITH_YOUR_PASSWORD":
-        print("!!! PLEASE EDIT THE SCRIPT TO SET YOUR METABASE_PASSWORD !!!")
-    else:
-        df = fetch_question_data(
-            question_id=QUESTION_ID_TO_FETCH,
-            metabase_url=METABASE_URL,
-            username=METABASE_USERNAME,
-            password=METABASE_PASSWORD,
-            team=METABASE_TEAM,
-            workers=WORKER_COUNT,
-            page_size=PAGE_SIZE
-        )
 
-        if df is not None:
-            print("\n" + "="*50)
-            print("✅ DATA FETCHED SUCCESSFULLY!")
-            print(f"DataFrame Shape: {df.shape[0]} rows, {df.shape[1]} columns")
-            print("First 5 rows:")
-            print(df.head())
-        else:
-            print("\n" + "="*50)
-            print("❌ FAILED TO FETCH DATA.")
+    df = fetch_question_data(
+        question_id=QUESTION_ID_TO_FETCH,
+        metabase_url=METABASE_URL,
+        username=METABASE_USERNAME,
+        password=METABASE_PASSWORD,
+        team=METABASE_TEAM,
+        workers=WORKER_COUNT,
+        page_size=PAGE_SIZE,
+    )
+
+    if df is not None:
+        print("\n" + "="*50)
+        print("✅ DATA FETCHED SUCCESSFULLY!")
+        print(f"DataFrame Shape: {df.shape[0]} rows, {df.shape[1]} columns")
+        print("First 5 rows:")
+        print(df.head())
+    else:
+        print("\n" + "="*50)
+        print("❌ FAILED TO FETCH DATA.")
